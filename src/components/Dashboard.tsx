@@ -222,7 +222,6 @@ export default function Dashboard() {
           <div>
             <h1 className="text-4xl font-bold text-slate-800 mb-2">
               ネット速度モニター
-              <span className="text-lg font-normal text-slate-500 ml-3">powered by TanStack</span>
             </h1>
             <p className="text-slate-600">
               24時間の速度変動をリアルタイム監視 
