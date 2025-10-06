@@ -27,6 +27,8 @@ const updateConfig = async (config: Config): Promise<Config> => {
 
 export default function Dashboard() {
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
   const [intervalInput, setIntervalInput] = useState('');
   const [showIntervalModal, setShowIntervalModal] = useState(false);
   const queryClient = useQueryClient();
@@ -67,6 +69,17 @@ export default function Dashboard() {
     const now = new Date();
     let cutoff: Date;
 
+    if (timeRange === 'custom' && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999); // 終日を含める
+      
+      return data.filter(d => {
+        const timestamp = new Date(d.timestamp);
+        return timestamp >= start && timestamp <= end;
+      });
+    }
+
     switch (timeRange) {
       case '24h':
         cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -79,7 +92,7 @@ export default function Dashboard() {
     }
 
     return data.filter(d => new Date(d.timestamp) >= cutoff);
-  }, [data, timeRange]);
+  }, [data, timeRange, customStartDate, customEndDate]);
 
   // 基本統計
   const stats = useMemo(() => {
@@ -363,7 +376,7 @@ export default function Dashboard() {
 
         {/* 時間範囲選択 */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             <button
               onClick={() => setTimeRange('24h')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
@@ -394,6 +407,42 @@ export default function Dashboard() {
             >
               全期間
             </button>
+            
+            <div className="h-6 w-px bg-slate-300 mx-2"></div>
+            
+            <button
+              onClick={() => setTimeRange('custom')}
+              className={`px-4 py-2 rounded-lg font-medium transition ${
+                timeRange === 'custom'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📅 期間指定
+            </button>
+            
+            {timeRange === 'custom' && (
+              <>
+                <input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-slate-600">〜</span>
+                <input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {customStartDate && customEndDate && (
+                  <span className="text-sm text-slate-600">
+                    （{filteredData.length}件）
+                  </span>
+                )}
+              </>
+            )}
           </div>
         </div>
 

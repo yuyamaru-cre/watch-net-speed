@@ -35,4 +35,4 @@ export interface Config {
   intervalMinutes: number;
 }
 
-export type TimeRange = '24h' | '7d' | 'all';
+export type TimeRange = '24h' | '7d' | 'all' | 'custom';
