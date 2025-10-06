@@ -4,6 +4,9 @@ export interface SpeedData {
   upload: number;
   ping: number;
   jitter: number;
+  server?: string;
+  isp?: string;
+  method?: 'ookla' | 'netflix';
 }
 
 export interface Stats {
@@ -33,6 +36,7 @@ export interface TimeSlotStat {
 
 export interface Config {
   intervalMinutes: number;
+  method?: 'ookla' | 'netflix';
 }
 
 export type TimeRange = '24h' | '7d' | 'all' | 'custom';
